@@ -1,36 +1,25 @@
 {
   "name": "component_build",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.475.0",
-    "next": "15.1.6",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.1",
-    "tailwindcss-animate": "^1.0.7"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Padre108/component_build.git"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Padre108/component_build/issues"
+  },
+  "homepage": "https://github.com/Padre108/component_build#readme",
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@eslint/js": "^9.20.0",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9.20.0",
-    "eslint-config-next": "15.1.6",
-    "eslint-plugin-react": "^7.37.4",
-    "globals": "^15.14.0",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "typescript-eslint": "^8.23.0"
+    "concurrently": "^9.1.2",
+    "typescript": "^5.8.2"
   }
 }
