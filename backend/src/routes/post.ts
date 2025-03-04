@@ -1,5 +1,5 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -44,8 +44,7 @@ router.delete("/deletepost/:id", async (req, res) => {
     res.json(post);
   } catch (error) {
     console.error("Error deleting post:", error);
-    if ((error as any).code === "P2025") {
-      // Prisma error code for "Record to delete does not exist"
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
       res.status(404).json({ error: "Post not found" });
     } else {
       res.status(500).json({ error: "Error deleting post", details: (error as any).message });

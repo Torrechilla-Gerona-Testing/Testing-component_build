@@ -19,3 +19,10 @@ model Post {
   content   String?
   createdAt DateTime @default(now())
 }
+
+model Employee {
+  id          String   @id @default(uuid())
+  FirstName   String
+  LastName    String
+  salary      Int
+}
