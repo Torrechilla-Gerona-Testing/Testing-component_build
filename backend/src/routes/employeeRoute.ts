@@ -1,30 +1,89 @@
-import express, { Router } from "express";
+import express, { Router, Request, Response } from "express";
 import { PrismaClient, Prisma } from "@prisma/client";
 
-const router = express.Router();
+const router: Router = express.Router();
 const prisma = new PrismaClient();
 
-
-
-router.get("/", async (req,res) =>{
-    const data = [
-        {id :1, Name:"John Patrick", role: "manager", salary: 123 }, 
-        {id :2, Name:"Clyde", role: "trisikad Driver", salary: 2000000 },
-        {id :3, Name:"Sid", role: "Product owner", salary: 50 },
-        {id :4, Name:"Ryan", role: "Ambassador", salary: 123 },
-        {id :5, Name:"Prince", role: "Fullstack", salary: 123 }]
-        
-    
-    // try{
-    //     // const employee = await prisma.employee.findMany()
-    //     res.json(data)
-    // }catch (error) {
-    //     console.error("Error fetching posts:", error);
-    //     res.status(500).json({ error: "Error fetching posts" });
-    //   } finally {
-    //     // await prisma.$disconnect(); 
-    //   }
-    res.json(data)
+// GET route to fetch all employees
+router.get("/", async (req, res) => {
+    try {
+        const employees = await prisma.employee.findMany();
+        res.json(employees);
+    } catch (error) {
+        console.error("Error fetching employees:", error);
+        res.status(500).json({ error: "Error fetching employees" });
+    } finally {
+        await prisma.$disconnect();
+    }
 });
 
-export default router
+// POST route to add a new employee
+router.post("/add", async (req, res) => {
+  const { FirstName, LastName, groupName, role, expectedSalary, expectedDateOfDefense } = req.body;
+
+  try {
+      const newEmployee = await prisma.employee.create({
+          data: {
+              FirstName,
+              LastName,
+              groupName,
+              role,
+              expectedSalary: parseFloat(expectedSalary), // Convert to number
+              expectedDateOfDefense: new Date(expectedDateOfDefense), // Convert to Date
+          },
+      });
+      res.status(201).json(newEmployee);
+  } catch (error) {
+      console.error("Error creating employee:", error);
+      res.status(500).json({ error: "Error creating employee" });
+  } finally {
+      await prisma.$disconnect();
+  }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+        await prisma.employee.delete({
+            where: {
+                id
+            },
+        });
+        res.status(204).send();
+    } catch (error) {
+        console.error("Error deleting employee:", error);
+        res.status(500).json({ error: "Error deleting employee" });
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
+router.put("/update/:id", async (req, res) => {
+    const { id } = req.params;
+    const { FirstName, LastName, groupName, role, expectedSalary, expectedDateOfDefense } = req.body;
+  
+    try {
+        const updatedEmployee = await prisma.employee.update({
+            where: {
+                id
+            },
+            data: {
+                FirstName,
+                LastName,
+                groupName,
+                role,
+                expectedSalary: parseFloat(expectedSalary), // Convert to number
+                expectedDateOfDefense: new Date(expectedDateOfDefense), // Convert to Date
+            },
+        });
+        res.status(200).json(updatedEmployee);
+    } catch (error) {
+        console.error("Error updating employee:", error);
+        res.status(500).json({ error: "Error updating employee" });
+    } finally {
+        await prisma.$disconnect();
+    }
+});
+
+export default router;

@@ -21,8 +21,11 @@ model Post {
 }
 
 model Employee {
-  id          String   @id @default(uuid())
-  FirstName   String
-  LastName    String
-  salary      Int
+  id                    String   @id @default(uuid())
+  FirstName             String
+  LastName              String
+  groupName             String
+  role                  String
+  expectedSalary        Int
+  expectedDateOfDefense DateTime
 }

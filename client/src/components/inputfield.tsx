@@ -6,7 +6,7 @@ interface InputFieldProps {
     design: string;
 }
 
-const InputField: React.FC<InputFieldProps> = ({type, placeholder, design}) => {
+export const InputField: React.FC<InputFieldProps> = ({type, placeholder, design}) => {
     return (
         <div>
             <input
@@ -19,4 +19,3 @@ const InputField: React.FC<InputFieldProps> = ({type, placeholder, design}) => {
     );
 };
 
-export default InputField;
