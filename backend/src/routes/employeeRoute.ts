@@ -28,8 +28,8 @@ router.post("/add", async (req, res) => {
               LastName,
               groupName,
               role,
-              expectedSalary: parseFloat(expectedSalary), // Convert to number
-              expectedDateOfDefense: new Date(expectedDateOfDefense), // Convert to Date
+              expectedSalary: parseFloat(expectedSalary), 
+              expectedDateOfDefense: new Date(expectedDateOfDefense), 
           },
       });
       res.status(201).json(newEmployee);

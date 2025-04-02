@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import DotenvFlow from "dotenv-flow";
 import post from "./routes/post"; 
 import employeeRoute from "./routes/employeeRoute"
 
 dotenv.config();
+DotenvFlow.config()
 
 const app = express();
 const PORT = process.env.PORT || 5000;
