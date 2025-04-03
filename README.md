@@ -11,7 +11,7 @@ git clone https://github.com/Torrechilla-Gerona-Testing/Testing-component_build.
 ```sh
 cd backend
 ```
-*
+#
 ```sh
 npm run test
 ```
