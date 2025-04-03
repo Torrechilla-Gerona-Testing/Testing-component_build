@@ -1,11 +1,11 @@
-# Clone the project
-- git clone https://github.com/Torrechilla-Gerona-Testing/Testing-component_build.git
+# Testing Component Build
 
-after cloning it:
--open the file
+## Clone the Project
+To clone the repository, run the following command:
 
+```sh
+git clone https://github.com/Torrechilla-Gerona-Testing/Testing-component_build.git
+```
 
-#For testing
-*the test files are located at the __test__ folder
--cd backend
--npm run test
+cd backend
+npm run test
