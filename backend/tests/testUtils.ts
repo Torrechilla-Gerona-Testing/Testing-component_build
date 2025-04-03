@@ -2,7 +2,12 @@ import testPrisma from '../prisma/test-client';
 import { TestEmployeeData } from '../tests/database.type';
 
 export const resetDB = async () => {
-  await testPrisma.employee.deleteMany();
+  try {
+    await testPrisma.$executeRaw`TRUNCATE TABLE "Employee" RESTART IDENTITY CASCADE`;
+  } catch (error) {
+    console.error('Database cleanup failed:', error);
+    throw error;
+  }
 };
 
 export const createTestEmployee = async (data: Partial<TestEmployeeData> = {}) => {
