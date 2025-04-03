@@ -19,6 +19,7 @@ const testPrisma = new PrismaClient({
 });
 
 describe('Employee API', () => {
+  jest.setTimeout(30000);
   beforeAll(async () => {
     try {
       await testPrisma.$queryRaw`SELECT 1`;
@@ -26,7 +27,7 @@ describe('Employee API', () => {
       console.error("Failed to connect to DB:", error);
       throw error;
     }
-  },30000);
+  },10000);
 
   beforeEach(async () => {
     await testPrisma.$disconnect();
@@ -71,14 +72,33 @@ describe('Employee API', () => {
         .expect(500);
   
       expect(response.body).toMatchObject({
-        error: "Error creating employee",
+        error: "Internal server error creating employee",
+      });
+    });
+
+    it('should return 400 for a missing field', async () => {
+      const invalidPayload = {
+        FirstName: null,
+        LastName: "Doe",
+        groupName: "Engineering",
+        role: "Developer",
+        expectedSalary: 20029,
+        expectedDateOfDefense: new Date("2024-12-31") 
+      };
+  
+      const response = await request(app)
+        .post('/employees/add')
+        .send(invalidPayload)
+        .expect(400);
+  
+      expect(response.body).toMatchObject({
+        error: "Error creating employee" ,
       });
     });
   });
 
   describe("GET /employees", () => {
     it("should return all employees", async () => {
-      // Create test employees
       const employee1 = await createTestEmployee({
         FirstName: "Jane",
         LastName: "Smith",
@@ -95,14 +115,11 @@ describe('Employee API', () => {
         expectedSalary: 65000,
       })
 
-      // Make request to the endpoint
       const response = await request(app).get("/employees").expect(200)
 
-      // Verify response
       expect(response.body).toBeInstanceOf(Array)
       expect(response.body.length).toBe(2)
 
-      // Check if the returned employees match the created ones
       expect(response.body).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -124,53 +141,185 @@ describe('Employee API', () => {
     })
 
     it("should return an empty array when no employees exist", async () => {
-      // Make request to the endpoint
       const response = await request(app).get("/employees").expect(200)
 
-      // Verify response is an empty array
       expect(response.body).toBeInstanceOf(Array)
       expect(response.body.length).toBe(0)
     })
   })
 
   describe("DELETE /employees/delete/:id", () => {
-  it("should delete an employee by ID", async () => {
-    // Create a test employee to delete
+    it("should delete an employee by ID", async () => {
+      const employee = await createTestEmployee({
+        FirstName: "Test",
+        LastName: "Delete",
+        groupName: "QA",
+        role: "Tester",
+        expectedSalary: 70000,
+      });
+      
+
+      const deleteResponse = await request(app)
+        .delete(`/employees/delete/${employee.id}`)
+        .expect(204);
+
+      expect(deleteResponse.body).toEqual({});
+
+      const checkEmployee = await testPrisma.employee.findUnique({
+        where: { id: employee.id },
+      });
+      
+      expect(checkEmployee).toBeNull();
+    });
+
+    it('should return 404 when employee does not exist', async () => {
+      const nonExistentId = '00000000-0000-0000-0000-000000000000'; // Random UUID
+      const response = await request(app)
+        .delete(`/employees/delete/${nonExistentId}`)
+        .expect(404);
+  
+      expect(response.body).toEqual({
+        error: 'Employee not found',
+      });
+    });
+  
+    it('should return 400 when ID is empty', async () => {
+      const response = await request(app)
+        .delete('/employees/delete/ ') // Space as ID
+        .expect(400);
+  
+      expect(response.body).toEqual({
+        error: 'Employee ID is required',
+      });
+    });
+  
+    it('should return 400 when ID is missing', async () => {
+      const response = await request(app)
+        .delete('/employees/delete') // No ID provided
+        .expect(400);
+  
+      expect(response.body).toEqual({
+        error: 'Employee ID is required',
+      });
+    });
+
+    
+  });
+
+  
+
+describe("PUT /employees/update/:id", () => {
+  it("should update an employee by ID", async () => {
+    // Create a test employee to update
     const employee = await createTestEmployee({
       FirstName: "Test",
-      LastName: "Delete",
+      LastName: "Update",
       groupName: "QA",
       role: "Tester",
       expectedSalary: 70000,
     });
 
-    // Make delete request
-    const deleteResponse = await request(app)
-      .delete(`/employees/delete/${employee.id}`)
-      .expect(204);
+    // Updated data
+    const updatedData = {
+      FirstName: "Updated",
+      LastName: "Employee",
+      groupName: "Development",
+      role: "Senior Tester",
+      expectedSalary: 85000,
+      expectedDateOfDefense: new Date("2025-06-30"),
+    };
 
-    // Verify the response is empty (204 No Content)
-    expect(deleteResponse.body).toEqual({});
+    // Make update request
+    const updateResponse = await request(app)
+      .put(`/employees/update/${employee.id}`)
+      .send(updatedData)
+      .expect(200);
 
-    // Verify the employee no longer exists in the database
+    // Verify the response contains updated data
+    expect(updateResponse.body).toMatchObject({
+      id: employee.id,
+      FirstName: "Updated",
+      LastName: "Employee",
+      groupName: "Development",
+      role: "Senior Tester",
+      expectedSalary: 85000,
+    });
+
+    // Verify the employee was actually updated in the database
+    const updatedEmployee = await testPrisma.employee.findUnique({
+      where: { id: employee.id },
+    });
+    
+    expect(updatedEmployee).not.toBeNull();
+    expect(updatedEmployee).toMatchObject({
+      FirstName: "Updated",
+      LastName: "Employee",
+      groupName: "Development",
+      role: "Senior Tester",
+    });
+  });
+
+  it("should return 400 when missing required fields", async () => {
+    // Create a test employee to update
+    const employee = await createTestEmployee({
+      FirstName: "Test",
+      LastName: "Missing",
+      groupName: "QA",
+      role: "Tester",
+      expectedSalary: 70000,
+    });
+
+    // Payload with missing fields
+    const invalidPayload = {
+      FirstName: "Updated",
+      // LastName is missing
+      groupName: "Development",
+      role: "Senior Tester",
+      expectedSalary: 85000,
+      expectedDateOfDefense: new Date("2025-06-30"),
+    };
+
+    // Make update request with invalid data
+    const response = await request(app)
+      .put(`/employees/update/${employee.id}`)
+      .send(invalidPayload)
+      .expect(400);
+
+    // Verify error response
+    expect(response.body).toMatchObject({
+      error: "All fields are required for update",
+    });
+
+    // Verify the employee was NOT updated in the database
     const checkEmployee = await testPrisma.employee.findUnique({
       where: { id: employee.id },
     });
     
-    expect(checkEmployee).toBeNull();
+    expect(checkEmployee).not.toBeNull();
+    expect(checkEmployee!.LastName).toBe("Missing"); // Should still have original value
   });
 
-  it("should return 500 when trying to delete non-existent employee", async () => {
+  it("should return 500 when trying to update non-existent employee", async () => {
     // Use a non-existent ID
     const nonExistentId = "non-existent-id";
 
-    // Make delete request with non-existent ID
+    const updateData = {
+      FirstName: "Updated",
+      LastName: "NonExistent",
+      groupName: "Development",
+      role: "Senior Tester",
+      expectedSalary: 85000,
+      expectedDateOfDefense: new Date("2025-06-30"),
+    };
+
+    // Make update request with non-existent ID
     const response = await request(app)
-      .delete(`/employees/delete/${nonExistentId}`)
+      .put(`/employees/update/${nonExistentId}`)
+      .send(updateData)
       .expect(500);
 
     // Verify error response
-    expect(response.body).toHaveProperty("error", "Error deleting employee");
+    expect(response.body).toHaveProperty("error", "Employee not found");
   });
 });
 });
