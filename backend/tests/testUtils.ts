@@ -4,6 +4,8 @@ import { TestEmployeeData } from '../tests/database.type';
 export const resetDB = async () => {
   try {
     await testPrisma.$executeRaw`TRUNCATE TABLE "Employee" RESTART IDENTITY CASCADE`;
+    await testPrisma.$executeRaw`TRUNCATE TABLE "Post" RESTART IDENTITY CASCADE`;
+   
   } catch (error) {
     console.error('Database cleanup failed:', error);
     throw error;

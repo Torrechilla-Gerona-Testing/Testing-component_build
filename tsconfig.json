@@ -1,35 +1,38 @@
 {
-    "compilerOptions": {
-      "target": "ES2017",
-      "lib": ["dom", "dom.iterable", "esnext"],
-      "allowJs": true,
-      "skipLibCheck": true,
-      "strict": true,
-      "noEmit": true,
-      "esModuleInterop": true,
-      "module": "esnext",
-      "moduleResolution": "bundler",
-      "resolveJsonModule": true,
-      "isolatedModules": true,
-      "jsx": "preserve",
-      "incremental": true,
-      "plugins": [
-        {
-          "name": "next"
-        }
-      ],
-      "paths": {
-        "@client/*": ["./client/src/*"],
-        "@backend/*": ["./backend/src/*"]
+  "compilerOptions": {
+    "target": "ES6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true, // Ensure this is set to true to avoid type conflicts
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
       }
-    },
-    "include": [
-      "next-env.d.ts",
-      "**/*.ts",
-      "**/*.tsx",
-      ".next/types/**/*.ts",
-      "backend/**/*.ts"
     ],
-    "exclude": ["node_modules"]
-  }
-  
+    "paths": {
+      "@client/*": ["./client/src/*"],
+      "@backend/*": ["./backend/src/*"]
+    },
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": [
+    "src/**/*",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "backend/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

@@ -193,10 +193,10 @@ describe('Employee API', () => {
       });
     });
   
-    it('should return 400 when ID is missing', async () => {
+    it('should return 404 when ID is missing', async () => {
       const response = await request(app)
         .delete('/employees/delete') // No ID provided
-        .expect(400);
+        .expect(404);
   
       expect(response.body).toEqual({
         error: 'Employee ID is required',

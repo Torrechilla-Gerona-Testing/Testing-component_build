@@ -29,3 +29,10 @@ model Employee {
   expectedSalary        Int
   expectedDateOfDefense DateTime
 }
+
+model FAQ {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
+}
