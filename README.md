@@ -7,5 +7,5 @@ To clone the repository, run the following command:
 git clone https://github.com/Torrechilla-Gerona-Testing/Testing-component_build.git
 ```
 
-cd backend
-npm run test
+```cd backend```
+```npm run test```
